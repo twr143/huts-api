@@ -8,9 +8,16 @@ import cats.implicits._
 import cats.effect.IO
 import io.github.spf3000.hutsapi.entities._
 
+import java.util.concurrent.Executors
+import scala.concurrent.ExecutionContext
 
 final case class HutRepository[F[_]](private val huts: ListBuffer[HutWithId])(implicit e: Effect[F]) {
+
+  val blockingEC = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(4))
   val makeId: F[String] = e.delay { UUID.randomUUID().toString }
+
+  def getAll: F[List[HutWithId]] =
+    e.delay { huts.toList }
 
     def getHut(id: String): F[Option[HutWithId]] =
       e.delay { huts.find(_.id == id) }
@@ -23,7 +30,7 @@ final case class HutRepository[F[_]](private val huts: ListBuffer[HutWithId])(im
 
     def updateHut(hutWithId: HutWithId): F[Unit] = {
       for {
-        _ <- e.delay { huts -= hutWithId }
+        _ <- e.delay { huts.find(_.id == hutWithId.id).foreach(h => huts -= h) }
         _ <- e.delay { huts += hutWithId }
       } yield()
     }
@@ -36,5 +43,5 @@ final case class HutRepository[F[_]](private val huts: ListBuffer[HutWithId])(im
       HutWithId(id, hut.name)
 }
 object HutRepository {
-  def empty[F[_]](implicit m: Effect[F]): IO[HutRepository[F]] = IO{new HutRepository[F](ListBuffer())}
+  def empty[F[_]](implicit m: Effect[F]): HutRepository[F] = new HutRepository[F](ListBuffer())
 }
