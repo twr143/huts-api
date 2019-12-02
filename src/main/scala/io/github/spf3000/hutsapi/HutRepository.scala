@@ -1,20 +1,32 @@
 package io.github.spf3000.hutsapi
 import java.util.UUID
+
 import cats.effect._
+
 import scala.collection.mutable.ListBuffer
 import cats.FlatMap
 import cats.implicits._
 import cats.effect.IO
 import io.github.spf3000.hutsapi.entities._
 import java.util.concurrent.Executors
+
+import ch.qos.logback.classic.{Level, Logger}
+
 import scala.concurrent.ExecutionContext
+import org.http4s.server.middleware.Logger
+import org.slf4j.LoggerFactory
 
 final case class HutRepository[F[_]](private val huts: ListBuffer[HutWithId])
                                     (implicit e: Effect[F], cs: ContextShift[F], timer: Timer[F]) {
+  implicit lazy val root: Logger = LoggerFactory.getLogger(s"${this.getClass.getCanonicalName}".replace("$", "")).asInstanceOf[ch.qos.logback.classic.Logger]
+  root.setLevel(Level.WARN)
 
   val blockingEC = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(4))
 
-  val makeId: F[String] = e.delay {
+  def makeIdInDifferentTP = cs.evalOn(blockingEC)(makeId)
+
+  def makeId: F[String] = e.delay {
+    root.warn("current thread in mkId: {}",Thread.currentThread().getId)
     UUID.randomUUID().toString
   }
 
@@ -30,8 +42,10 @@ final case class HutRepository[F[_]](private val huts: ListBuffer[HutWithId])
 
   def addHut(hut: Hut): F[String] =
     for {
-      uuid <- makeId
+      uuid <- makeIdInDifferentTP
+      _ <- cs.shift
       _ <- e.delay {
+        root.warn("current thread in addhut: {}",Thread.currentThread().getId)
         huts += hutWithId(hut, uuid)
       }
     } yield uuid
