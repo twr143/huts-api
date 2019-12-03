@@ -18,7 +18,8 @@ object HelloInterceptor {
     r => log.warn(s"resp logged ${r.toString}"); r
   }
 
-  def apply[F[_]](service: HttpRoutes[F])(implicit log: Logger, m: Effect[F]): HttpRoutes[F] = Kleisli { req: Request[F] =>
-    (logRequest[F](log).andThen(service.apply)(req)).map(logResponse(log))
-  }
+  def apply[F[_]](service: HttpRoutes[F])(implicit log: Logger, m: Effect[F]): HttpRoutes[F] =
+    Kleisli { req: Request[F] =>
+      service(logRequest(log)(req)).map(logResponse(log))
+    }
 }
