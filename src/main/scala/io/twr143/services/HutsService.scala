@@ -1,7 +1,7 @@
 package io.twr143.services
 import cats.effect.{Effect, Sync}
 import io.circe.Encoder
-import io.twr143.HutServer.{->, /, DELETE, GET, POST, PUT, Root}
+import io.twr143.FourSDemoServer.{->, /, DELETE, GET, POST, PUT, Root}
 import io.twr143.entities.{Hut, HutWithId}
 import io.twr143.repo.HutRepository
 import org.http4s.{EntityEncoder, HttpRoutes, Response, Status}

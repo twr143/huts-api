@@ -15,7 +15,7 @@ import org.http4s.circe._
 import org.http4s.dsl.io._
 import org.http4s.implicits._
 import cats.implicits._
-object HutServer extends IOApp with Http4sDsl[IO] {
+object FourSDemoServer extends IOApp with Http4sDsl[IO] {
 
   implicit val cs: ContextShift[IO] = IO.contextShift(global)
 

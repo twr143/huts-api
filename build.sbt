@@ -5,7 +5,7 @@ val CirceVersion = "0.9.1"
 
 lazy val root = (project in file("."))
   .settings(
-    organization := "io.github.spf3000",
+    organization := "io.twr143",
     name := "listings-api",
     version := "0.0.1-SNAPSHOT",
     scalaVersion := "2.12.4",
