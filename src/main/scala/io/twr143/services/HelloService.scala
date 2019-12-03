@@ -1,5 +1,6 @@
 package io.twr143.services
 import cats.effect._
+import ch.qos.logback.classic.Logger
 import io.circe.Encoder
 import org.http4s.{HttpRoutes, Response, Status}
 import io.circe.syntax._
@@ -22,7 +23,7 @@ object HelloService {
   implicit def jsonEncoder[A <: Product : Encoder, F[_] : Sync]: EntityEncoder[F, A] =
     jsonEncoderOf[F, A]
 
-  def service[F[_]](implicit F: Effect[F]) =
+  def service[F[_]](implicit F: Effect[F],logger: Logger) =
     HttpRoutes.of[F] {
       case GET -> Root / HALO / name =>
         F.pure(Response(status = Status.Ok).withEntity(s"halo, $name".asJson))
