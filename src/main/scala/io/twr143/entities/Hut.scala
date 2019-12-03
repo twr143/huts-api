@@ -1,5 +1,4 @@
-package io.github.spf3000.hutsapi.entities
-
+package io.twr143.entities
 
 case class Hut(name: String)
 

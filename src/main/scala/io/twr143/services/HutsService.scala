@@ -1,28 +1,30 @@
-package io.github.spf3000.hutsapi
-import cats.effect.IO
-import cats.Monad
-import cats.FlatMap
-import cats.implicits._
-import cats.effect._
-import fs2.Stream
+package io.twr143.services
+import cats.effect.{Effect, Sync}
+import io.circe.Encoder
+import io.twr143.HutServer.{->, /, DELETE, GET, POST, PUT, Root}
+import io.twr143.entities.{Hut, HutWithId}
+import io.twr143.repo.HutRepository
+import org.http4s.{EntityEncoder, HttpRoutes, Response, Status}
+import org.http4s.circe.jsonEncoderOf
+
+import scala.util.control.NonFatal
+import io.circe.Encoder
+import io.twr143.entities
+import scala.util.control.NonFatal
 import io.circe.syntax._
 import io.circe.generic.auto._
 import org.http4s._
 import org.http4s.circe._
-import org.http4s.dsl.Http4sDsl
-import org.http4s.server.blaze.{BlazeBuilder, BlazeServerBuilder}
 import org.http4s.dsl.io._
 import org.http4s.implicits._
-import scala.concurrent.ExecutionContext.Implicits.global
-import entities.Hut
-import entities._
-import io.circe.Encoder
-import org.http4s.server.Router
-import scala.util.control.NonFatal
+import cats.Monad
+import cats.FlatMap
+import cats.implicits._
 
-//import org.http4s.circe.CirceEntityEncoder._
-object HutServer extends IOApp with Http4sDsl[IO] {
-
+/**
+  * Created by Ilya Volynin on 03.12.2019 at 10:42.
+  */
+object HutsService {
   val HUTS = "huts"
 
   implicit def jsonEncoder[A <: Product : Encoder, F[_] : Sync]: EntityEncoder[F, A] =
@@ -54,15 +56,4 @@ object HutServer extends IOApp with Http4sDsl[IO] {
           .flatMap(_ => F.pure(Response(status = Status.NoContent)))
     }
 
-  implicit val cs: ContextShift[IO] = IO.contextShift(global)
-
-  implicit override val timer: Timer[IO] = IO.timer(global)
-
-  def httpApp(hutRepo: HutRepository[IO]) = Router("/" -> service(hutRepo)).orNotFound
-
-  def run(args: List[String]) =
-    BlazeServerBuilder[IO]
-      .bindHttp(8080, "0.0.0.0")
-      .withHttpApp(httpApp(HutRepository.empty[IO])).serve
-      .compile.drain.as(ExitCode.Success)
 }
