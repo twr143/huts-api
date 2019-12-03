@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import org.http4s.server.Router
 import org.slf4j.LoggerFactory
 import io.twr143.repo.HutRepository
-import io.twr143.services.HutsService
+import io.twr143.services.{HelloService, HutsService}
 import cats.implicits._
 import org.http4s._
 import org.http4s.circe._
@@ -30,7 +30,8 @@ object HutServer extends IOApp with Http4sDsl[IO] {
 
   root.setLevel(Level.WARN)
 
-  def httpApp(hutRepo: HutRepository[IO]) = Router("/" -> HutsService.service(hutRepo)).orNotFound
+  def httpApp(hutRepo: HutRepository[IO]) =
+    Router("/" -> HutsService.service(hutRepo),"/h"->HelloService.service[IO]).orNotFound
 
   def run(args: List[String]) =
     BlazeServerBuilder[IO]

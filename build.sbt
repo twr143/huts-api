@@ -28,3 +28,4 @@ resolvers += Resolver.sonatypeRepo("releases")
 addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.7")
 libraryDependencies += "org.typelevel" %% "spire" % "0.14.1"
 scalacOptions ++= Seq("-Ypartial-unification")
+//scalacOptions ++= Seq("-Xlog-implicits")

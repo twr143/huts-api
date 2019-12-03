@@ -68,5 +68,5 @@ final case class HutRepository[F[_]](private val huts: ListBuffer[HutWithId])
 
 object HutRepository {
 
-  def empty[F[_]](implicit m: Effect[F], cs: ContextShift[F], timer: Timer[F], root: Logger): HutRepository[F] = new HutRepository[F](ListBuffer())
+  def empty[F[_]](implicit m: Effect[F], cs: ContextShift[F], timer: Timer[F], root: Logger): HutRepository[F] = HutRepository[F](ListBuffer())
 }
