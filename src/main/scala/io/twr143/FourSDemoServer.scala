@@ -34,7 +34,7 @@ object FourSDemoServer extends IOApp with Http4sDsl[IO] {
 
   def run(args: List[String]) =
     BlazeServerBuilder[IO]
-      .bindHttp(8080, "0.0.0.0")
+      .bindHttp(8082, "0.0.0.0")
       .withHttpApp(httpApp(HutRepository.empty[IO])).serve
       .compile.drain.as(ExitCode.Success)
 }

@@ -2,11 +2,10 @@ package io.twr143.services
 import cats.effect.{Effect, Sync}
 import io.circe.Encoder
 import io.twr143.FourSDemoServer.{->, /, DELETE, GET, POST, PUT, Root}
-import io.twr143.entities.{Hut, HutWithId}
+import io.twr143.entities.{Hut, HutId, HutWithId}
 import io.twr143.repo.HutRepository
 import org.http4s.{EntityEncoder, HttpRoutes, Response, Status}
 import org.http4s.circe.jsonEncoderOf
-
 import scala.util.control.NonFatal
 import io.circe.Encoder
 import io.twr143.entities
@@ -25,6 +24,7 @@ import cats.implicits._
   * Created by Ilya Volynin on 03.12.2019 at 10:42.
   */
 object HutsService {
+
   val HUTS = "huts"
 
   implicit def jsonEncoder[A <: Product : Encoder, F[_] : Sync]: EntityEncoder[F, A] =
@@ -40,6 +40,10 @@ object HutsService {
           }
       case GET -> Root / HUTS =>
         hutRepo.getAll.map(all => Response(status = Status.Ok).withEntity(all.asJson))
+      case req@POST -> Root / "samples" =>
+        req.decodeJson[HutId]
+          .flatMap(hid => hutRepo.samples(hid.id))
+          .map(all => Response(status = Status.Ok).withEntity(all.asJson))
       case req@POST -> Root / HUTS =>
         req.decodeJson[Hut]
           .flatMap(hutRepo.addHut)
@@ -55,5 +59,4 @@ object HutsService {
         hutRepo.deleteHut(hutId)
           .flatMap(_ => F.pure(Response(status = Status.NoContent)))
     }
-
 }

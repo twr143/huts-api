@@ -1,13 +1,10 @@
 package io.twr143.repo
-
 import java.util.UUID
 import java.util.concurrent.Executors
-
 import cats.effect._
 import cats.implicits._
 import ch.qos.logback.classic.Logger
 import io.twr143.entities._
-
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext
 
@@ -19,7 +16,6 @@ final case class HutRepository[F[_]](private val huts: ListBuffer[HutWithId])
 
   val blockingEC = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(4))
 
-
   def makeIdInDifferentTP = cs.evalOn(blockingEC)(makeId)
 
   def makeId: F[String] = e.delay {
@@ -30,6 +26,11 @@ final case class HutRepository[F[_]](private val huts: ListBuffer[HutWithId])
   def getAll: F[List[HutWithId]] =
     e.delay {
       huts.toList
+    }
+
+  def samples(id: String): F[List[HutWithId]] =
+    e.delay {
+      List(hutWithId(Hut("winter"), id), hutWithId(Hut("summer caps"), UUID.randomUUID().toString))
     }
 
   def getHut(id: String): F[Option[HutWithId]] =
