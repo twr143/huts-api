@@ -19,6 +19,7 @@ final case class HutRepository[F[_]](private val huts: ListBuffer[HutWithId])
 
   val blockingEC = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(4))
 
+
   def makeIdInDifferentTP = cs.evalOn(blockingEC)(makeId)
 
   def makeId: F[String] = e.delay {

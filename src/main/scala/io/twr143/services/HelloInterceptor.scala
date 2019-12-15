@@ -10,16 +10,16 @@ import cats.effect._
   */
 object HelloInterceptor {
 
-  def logRequest[F[_]](implicit log: Logger): Request[F] => Request[F] = {
+  def logRequest[B[_]](implicit log: Logger): Request[B] => Request[B] = {
     r => log.warn(s"req logged ${r.toString}"); r
   }
 
-  def logResponse[F[_]](implicit log: Logger): Response[F] => Response[F] = {
+  def logResponse[B[_]](implicit log: Logger): Response[B] => Response[B] = {
     r => log.warn(s"resp logged ${r.toString}"); r
   }
 
-  def apply[F[_]](service: HttpRoutes[F])(implicit log: Logger, m: Effect[F]): HttpRoutes[F] =
-    Kleisli { req: Request[F] =>
+  def apply[B[_]](service: HttpRoutes[B])(implicit log: Logger, e: Effect[B]): HttpRoutes[B] =
+    Kleisli { req: Request[B] =>
       service(logRequest(log)(req)).map(logResponse(log))
     }
 }
