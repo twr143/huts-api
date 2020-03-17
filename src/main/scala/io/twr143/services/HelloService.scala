@@ -23,9 +23,9 @@ object HelloService {
   implicit def jsonEncoder[A <: Product : Encoder, F[_] : Sync]: EntityEncoder[F, A] =
     jsonEncoderOf[F, A]
 
-  def service[F[_]](implicit F: Effect[F],logger: Logger) =
+  def service[F[_]:Effect](implicit logger: Logger) =
     HttpRoutes.of[F] {
       case GET -> Root / HALO / name =>
-        F.pure(Response(status = Status.Ok).withEntity(s"halo, $name".asJson))
+        Effect[F].pure(Response(status = Status.Ok).withEntity(s"halo, $name".asJson))
     }
 }

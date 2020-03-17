@@ -17,17 +17,11 @@ import org.http4s.implicits._
 import cats.implicits._
 object FourSDemoServer extends IOApp with Http4sDsl[IO] {
 
-  implicit val cs: ContextShift[IO] = IO.contextShift(global)
-
-  implicit override val timer: Timer[IO] = IO.timer(global)
-
   implicit lazy val root: Logger = LoggerFactory.getLogger(s"${this.getClass.getCanonicalName}".replace("$", "")).asInstanceOf[ch.qos.logback.classic.Logger]
-
-  root.setLevel(Level.WARN)
 
   val hello = HelloService.service[IO]
 
-  val aggregateHello = HelloInterceptor(hello)
+  val aggregateHello = HelloInterceptor().wrap(hello)
                                 
   def httpApp(hutRepo: HutRepository[IO]) =
     Router("/" -> HutsService.service(hutRepo), "/h" -> aggregateHello).orNotFound
