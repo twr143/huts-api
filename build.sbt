@@ -8,7 +8,7 @@ lazy val root = (project in file("."))
     organization := "io.twr143",
     name := "listings-api",
     version := "0.0.1-SNAPSHOT",
-    scalaVersion := "2.12.4",
+    scalaVersion := "2.12.10",
     libraryDependencies ++= Seq(
       "org.http4s" %% "http4s-blaze-server" % Http4sVersion,
       "org.http4s" %% "http4s-blaze-client" % Http4sVersion,
@@ -25,7 +25,7 @@ lazy val root = (project in file("."))
 
 resolvers += Resolver.sonatypeRepo("releases")
 
-addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.7")
-libraryDependencies += "org.typelevel" %% "spire" % "0.14.1"
+addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.11.0" cross CrossVersion.full)
+//libraryDependencies += "org.typelevel" %% "spire" % "0.14.1"
 scalacOptions ++= Seq("-Ypartial-unification")
 //scalacOptions ++= Seq("-Xlog-implicits")
