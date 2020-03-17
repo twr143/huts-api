@@ -38,6 +38,6 @@ object HelloInterceptor {
     Kleisli { req: Request[B] =>
 //            service(logRequest(log)(req)).map(logResponse(log))
 //      (logRequestK andThen service run) (req).map(logResponse(log))
-      (logRequestK andThen service andThen logResponseK run)(req)
+      logRequestK andThen service andThen logResponseK apply req
     }
 }
