@@ -18,7 +18,7 @@ object HelloInterceptor {
   def logRequestK[B[_] : Sync](implicit log: Logger): Kleisli[OptionT[B, *], Request[B], Request[B]] =
     Kleisli { r =>
       OptionT.liftF(Sync[B].pure {
-        log.warn(s"req logged ${r.toString}");
+        log.warn(s"reqK logged ${r.toString}");
         r
       })
     }
@@ -26,10 +26,18 @@ object HelloInterceptor {
   def logResponse[B[_]](implicit log: Logger): Response[B] => Response[B] = {
     r => log.warn(s"resp logged ${r.toString}"); r
   }
+  def logResponseK[B[_] : Sync](implicit log: Logger): Kleisli[OptionT[B, *], Response[B], Response[B]] =
+    Kleisli { r =>
+      OptionT.liftF(Sync[B].pure {
+        log.warn(s"respK logged ${r.toString}");
+        r
+      })
+    }
 
   def apply[B[_] : Effect](service: HttpRoutes[B])(implicit log: Logger): HttpRoutes[B] =
     Kleisli { req: Request[B] =>
-      //      service(logRequest(log)(req)).map(logResponse(log))
-      (logRequestK andThen service run) (req).map(logResponse(log))
+//            service(logRequest(log)(req)).map(logResponse(log))
+//      (logRequestK andThen service run) (req).map(logResponse(log))
+      (logRequestK andThen service andThen logResponseK run)(req)
     }
 }
